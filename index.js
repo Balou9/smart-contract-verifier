@@ -1,10 +1,12 @@
 const https = require('https');
-const hre = require('hardhat');
+const fs = require('fs').promises;
 
-const SOURCIFY_API_URL = 'https://api.sourcify.dev/verify';
+async function main(contractAddress, contractSourceCodeUrl) {
 
-async function main(contractAddress, contractSourceCode) {
-    const srcCode = contractSourceCode;
+  const sourceCode = await fs.readFile(contractSourceCodeUrl, 'utf8');
+
+  console.log('File content:', sourceCode);
+
     const data = JSON.stringify({
         address: contractAddress,
         sourceCode,
@@ -28,7 +30,7 @@ async function main(contractAddress, contractSourceCode) {
         res.on('data', (d) => {
           const result = JSON.parse(d.toString());
           if (result.status === 'success') {
-            console.log('Verification successful!');
+            console.log('Verification successful!', result);
           } else {
             console.error('Verification failed:', result.message);
           }
@@ -43,11 +45,11 @@ async function main(contractAddress, contractSourceCode) {
       req.end();
 }
 
-main("0x48Cc1a4e8994473C1f511A95c167698061Bad8Df", "noop")
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+// main("0x48Cc1a4e8994473C1f511A95c167698061Bad8Df", "SafeMPECDH.sol")
+//   .then(() => process.exit(0))
+//   .catch((error) => {
+//     console.error(error);
+//     process.exit(1);
+//   });
 
 module.exports = main;
