@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 
 async function main(contractAddress, contractSourceCodeUrl) {
   const sourceCode = await fs.readFile(contractSourceCodeUrl, 'utf8');
-  console.log('File content:', sourceCode);
+  // console.log('File content:', sourceCode);
 
     const data = JSON.stringify({
         address: contractAddress,
@@ -26,22 +26,34 @@ async function main(contractAddress, contractSourceCodeUrl) {
         },
     };
 
-    const req = https.request(options, (res) => {
+    return new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
         console.log(`statusCode: ${res.statusCode}`);
-    
+
+        let responseBody = '';
         res.on('data', (d) => {
-          if (d) {
-            console.log('Verification successful!', d);
-          }
+          responseBody += d.toString();
         });
+
+        res.on('end', () => {
+          try {
+            if (res.statusCode === 200) {
+              const response = JSON.parse(responseBody);
+              resolve(response)
+            } else {
+              reject(new Error(`Verification failed: ${responseBody}`))
+            }
+          } catch (error) {
+            reject(error)
+          }
       });
-    
-      req.on('error', (error) => {
-        console.error(error);
-      });
-    
-      req.write(data);
-      req.end();
+    });
+
+    req.on('error', reject);
+
+    req.write(data);
+    req.end();
+    });
 }
 
 module.exports = main;
