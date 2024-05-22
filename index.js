@@ -19,7 +19,7 @@ async function main(contractAddress, contractSourceCodeUrl) {
     const options = {
         hostname: 'staging.sourcify.dev',
         path: '/verify',
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': data.length,
@@ -38,8 +38,8 @@ async function main(contractAddress, contractSourceCodeUrl) {
         res.on('end', () => {
           try {
             if (res.statusCode === 200) {
-              const response = JSON.parse(responseBody);
-              resolve(response)
+              // const response = JSON.parse(responseBody);
+              resolve(responseBody)
             } else {
               reject(new Error(`Verification failed: ${responseBody}`))
             }
