@@ -1,20 +1,25 @@
 const https = require('https');
 const fs = require('fs').promises;
+const path = require('path');
 
 async function main(contractAddress, contractSourceCodeUrl) {
   if (contractSourceCodeUrl.startsWith("https://raw.githubusercontent.com/")) {
     var sourceCode = await fetch(contractSourceCodeUrl)
       .then((response) => response.text());
   } else {
+    // check if filename has .sol suffix
     var sourceCode = await fs.readFile(contractSourceCodeUrl, 'utf8');
   }
+
+  const solFileName = path.basename(contractSourceCodeUrl) 
+  // console.log("file name::::: " + solFileName, "sourceCode::::: " + sourceCode, "contractSourceCodeUrl::::: " + contractSourceCodeUrl)
 
   const data = JSON.stringify({
       address: contractAddress,
       chain: "11155111",
       files: {
             "metadata.json": "{}",
-            "SafeMPECDH.sol": sourceCode
+            '${solFileName}': sourceCode
           },
       creatorTxHash: "string",
       chosenContract: "string"
