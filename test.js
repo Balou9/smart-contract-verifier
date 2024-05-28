@@ -7,6 +7,7 @@ test('test - Local smart contract verification', async function (t) {
     const vrfr_payload = await smart_contract_verifier("11155111", mpecdh_adress, mpecdh_url)
     console.log(vrfr_payload)
     t.ok(vrfr_payload, "is truthy")
+    t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
     t.end()
 })
 
@@ -15,6 +16,7 @@ test('test - Github source code smart contract verification', async function (t)
     const vrfr_payload = await smart_contract_verifier("11155111", mpecdh_adress, github_contract_url)
     console.log(vrfr_payload)
     t.ok(vrfr_payload, "is thruthy")
+    t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
     t.end()
 })
 
