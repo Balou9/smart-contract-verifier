@@ -2,24 +2,26 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
-async function main(contractAddress, contractSourceCodeUrl) {
+async function main(chainId, contractAddress, contractSourceCodeUrl) {
+  if (!contractSourceCodeUrl.endsWith(".sol")) {
+    throw(new Error(`${contractSourceCodeUrl} is not a solidity file.`))
+  }
+
   if (contractSourceCodeUrl.startsWith("https://raw.githubusercontent.com/")) {
     var sourceCode = await fetch(contractSourceCodeUrl)
       .then((response) => response.text());
   } else {
-    // check if filename has .sol suffix
     var sourceCode = await fs.readFile(contractSourceCodeUrl, 'utf8');
   }
 
-  const solFileName = path.basename(contractSourceCodeUrl) 
-  // console.log("file name::::: " + solFileName, "sourceCode::::: " + sourceCode, "contractSourceCodeUrl::::: " + contractSourceCodeUrl)
+  const solFileName = path.basename(contractSourceCodeUrl)
 
   const data = JSON.stringify({
       address: contractAddress,
-      chain: "11155111",
+      chain: chainId,
       files: {
             "metadata.json": "{}",
-            '${solFileName}': sourceCode
+            [solFileName]: sourceCode
           },
       creatorTxHash: "string",
       chosenContract: "string"
@@ -37,7 +39,9 @@ async function main(contractAddress, contractSourceCodeUrl) {
 
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
-    console.log(`statusCode: ${res.statusCode}`);
+    if (res.statusCode !== 200) {
+      throw(new Error(`statusCode: ${res.statusCode}`))
+    }
     let responseBody = '';
     res.on('data', (d) => {
       responseBody += d.toString();
@@ -46,7 +50,12 @@ async function main(contractAddress, contractSourceCodeUrl) {
       try {
         if (res.statusCode === 200) {
           // const response = JSON.parse(responseBody);
-          resolve(responseBody)
+          resolve(
+            {
+              "statusCode": res.statusCode,
+              "responseBody": responseBody,
+            }
+          )
         } else {
           reject(new Error(`Verification failed: ${responseBody}`))
         }
