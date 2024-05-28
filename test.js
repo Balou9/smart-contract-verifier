@@ -3,7 +3,7 @@ const smart_contract_verifier = require('./index.js')
 const mpecdh_adress = "0x48Cc1a4e8994473C1f511A95c167698061Bad8Df"
 
 test('test - Local smart contract verification', async function (t) {
-    const mpecdh_url = "SafeMPECDH.sol"
+    const mpecdh_url = "./fixtures/SafeMPECDH.sol"
     const vrfr_payload = await smart_contract_verifier("11155111", mpecdh_adress, mpecdh_url)
     console.log(vrfr_payload)
     t.ok(vrfr_payload, "is truthy")
@@ -26,10 +26,10 @@ test('test - Ensures function throws appropriate error when given a non-solidity
   
     try {
       await smart_contract_verifier("11155111", mpecdh_adress, non_solfile_url)
-      t.fail("Expected an error to be thrown")
+      t.fail("expected an error to be thrown")
     } catch (error) {
-      t.ok(error instanceof Error, "Error is thrown")
-      t.equal(error.message, expectedErrorMessage, `Promts correct error message: ${expectedErrorMessage}`)
+      t.ok(error instanceof Error, "error is thrown")
+      t.equal(error.message, expectedErrorMessage, `prompts correct error message: ${expectedErrorMessage}`)
     }
     t.end()    
 })
