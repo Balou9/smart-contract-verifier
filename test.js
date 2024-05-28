@@ -33,3 +33,6 @@ test('test - Ensures function throws appropriate error when given a non-solidity
     }
     t.end()    
 })
+
+// getSourcifyChainId
+// add error handling/tests if the given chainId is not supported for contract verification
