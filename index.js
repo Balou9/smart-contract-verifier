@@ -2,7 +2,7 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
-async function main(chainId, contractAddress, contractSourceCodeUrl) {
+async function verify(chainId, contractAddress, contractSourceCodeUrl) {
   if (!contractSourceCodeUrl.endsWith(".sol")) {
     throw(new Error(`${contractSourceCodeUrl} is not a solidity file.`))
   }
@@ -20,19 +20,19 @@ async function main(chainId, contractAddress, contractSourceCodeUrl) {
       address: contractAddress,
       chain: chainId,
       files: {
-            "metadata.json": "{}",
+            "metadata.json": "{...}",
             [solFileName]: sourceCode
-          },
-      creatorTxHash: "string",
-      chosenContract: "string"
+      }
+      // creatorTxHash: "string",
+      // chosenContract: "string"
   });
   
   const options = {
-      hostname: 'staging.sourcify.dev',
+      hostname: 'sourcify.dev',
       path: '/verify',
-      method: 'GET',
+      method: 'GET', // ? docs: POST https://docs.sourcify.dev/docs/api/#/Stateless%20Verification/post_verify
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Content-Length': data.length,
       },
   };
@@ -49,13 +49,12 @@ async function main(chainId, contractAddress, contractSourceCodeUrl) {
     res.on('end', () => {
       try {
         if (res.statusCode === 200) {
-          // const response = JSON.parse(responseBody);
-          resolve(
-            {
-              "statusCode": res.statusCode,
-              "responseBody": responseBody,
-            }
-          )
+          const response = responseBody
+          // const response = JSON.parse(responseBody); // ?
+          resolve({
+            statusCode: res.statusCode,
+            response: response
+          });
         } else {
           reject(new Error(`Verification failed: ${responseBody}`))
         }
@@ -71,4 +70,6 @@ async function main(chainId, contractAddress, contractSourceCodeUrl) {
   });
 }
 
-module.exports = main;
+module.exports = {
+  verify
+};
