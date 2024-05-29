@@ -11,13 +11,31 @@ test('test - Local smart contract verification', async function (t) {
     t.end()
 })
 
-test('test - Github source code smart contract verification', async function (t) {
+test('test - Github source code smart contract verification - Ethereum Testnet Sepolia', async function (t) {
     const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
     const vrfr_payload = await verify("11155111", mpecdh_adress, github_contract_url)
     console.log(vrfr_payload)
     t.ok(vrfr_payload, "is thruthy")
     t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
     t.end()
+})
+
+test('test - Github source code smart contract verification - Ethereum Mainnet', async function (t) {
+  const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
+  const vrfr_payload = await verify("1", mpecdh_adress, github_contract_url)
+  console.log(vrfr_payload)
+  t.ok(vrfr_payload, "is thruthy")
+  t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
+  t.end()
+})
+
+test('test - Github source code smart contract verification - Gnosis', async function (t) {
+  const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
+  const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url)
+  console.log(vrfr_payload)
+  t.ok(vrfr_payload, "is thruthy")
+  t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
+  t.end()
 })
 
 test('test - Ensures function throws appropriate error when given a non-solidity file', async function (t) {

@@ -22,9 +22,9 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl) {
       files: {
             "metadata.json": "{...}",
             [solFileName]: sourceCode
-      }
-      // creatorTxHash: "string",
-      // chosenContract: "string"
+      },
+      creatorTxHash: "string",
+      chosenContract: "string"
   });
   
   const options = {
