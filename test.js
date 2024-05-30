@@ -4,10 +4,16 @@ const mpecdh_adress = "0x48Cc1a4e8994473C1f511A95c167698061Bad8Df"
 
 test('test - Local smart contract verification', async function (t) {
     const mpecdh_url = "./fixtures/SafeMPECDH.sol"
-    const vrfr_payload = await verify("11155111", mpecdh_adress, mpecdh_url)
-    console.log(vrfr_payload)
-    t.ok(vrfr_payload, "is truthy")
-    t.equal(vrfr_payload.statusCode, 200, "response status code equals 200")
+
+    try {
+      const vrfr_payload = await verify("11155111", mpecdh_adress, mpecdh_url)
+      console.log(vrfr_payload)
+      t.ok(vrfr_payload, "is truthy")
+      t.equal(vrfr_payload.statusCode, 200, "response status code equals 200")
+    } catch (error) {
+      t.fails()
+    }
+
     t.end()
 })
 
@@ -37,6 +43,19 @@ test('test - Github source code smart contract verification - Gnosis', async fun
   t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
   t.end()
 })
+
+// test('test - Github source code smart contract verification - invalid chain id', async function (t) {
+//   const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
+//   // const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url)
+//   try {
+//     await verify('invalid-chain', mpecdh_adress, github_contract_url);
+//     t.fail('Expected error for invalid VRFR code');
+//   } catch (error) {
+//     t.ok(error.message); // More informative assertion
+//   }
+
+//   t.end();
+// })
 
 test('test - Ensures function throws appropriate error when given a non-solidity file', async function (t) {
     const non_solfile_url = "./fixtures/noop.txt"

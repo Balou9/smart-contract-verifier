@@ -28,9 +28,9 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl) {
   });
   
   const options = {
-      hostname: 'sourcify.dev',
+      hostname: 'staging.sourcify.dev',
       path: '/verify',
-      method: 'GET', // ? docs: POST https://docs.sourcify.dev/docs/api/#/Stateless%20Verification/post_verify
+      method: 'POST', // ? docs: POST https://docs.sourcify.dev/docs/api/#/Stateless%20Verification/post_verify
       headers: {
         'Accept': 'application/json',
         'Content-Length': data.length,
