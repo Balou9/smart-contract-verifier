@@ -2,7 +2,32 @@ const https = require('https');
 const fs = require('fs').promises;
 const path = require('path');
 
-async function verify(chainId, contractAddress, contractSourceCodeUrl) {
+function isValidChainId (chainId) {
+  const url = 'https://sourcify.dev/server/chains';
+
+  https.get(url, (res) => {
+    console.log(`statusCode: ${res.statusCode}`);
+    console.log(`headers: ${JSON.stringify(res.headers)}`);
+
+    let rawData = '';
+    res.on('data', (chunk) => { rawData += chunk; });
+    res.on('end', () => {
+      try {
+        const parsedData = JSON.parse(rawData);
+        console.log(parsedData);
+      } catch (error) {
+        console.error(error.message);
+      }
+    });
+  }).on('error', (error) => {
+    console.error(error);
+  });
+}
+
+async function verify(chainId, contractAddress, contractSourceCodeUrl, contractMetadata) {
+
+  // if contractMetadata is not json dann
+
   if (!contractSourceCodeUrl.endsWith(".sol")) {
     throw(new Error(`${contractSourceCodeUrl} is not a solidity file.`))
   }
@@ -20,17 +45,15 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl) {
       address: contractAddress,
       chain: chainId,
       files: {
-            "metadata.json": "{...}",
+            "metadata.json": contractMetadata,
             [solFileName]: sourceCode
-      },
-      creatorTxHash: "string",
-      chosenContract: "string"
+      }
   });
   
   const options = {
       hostname: 'staging.sourcify.dev',
       path: '/verify',
-      method: 'POST', // ? docs: POST https://docs.sourcify.dev/docs/api/#/Stateless%20Verification/post_verify
+      method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Length': data.length,
@@ -50,7 +73,7 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl) {
       try {
         if (res.statusCode === 200) {
           const response = responseBody
-          // const response = JSON.parse(responseBody); // ?
+          // const response = JSON.parse(responseBody); //
           resolve({
             statusCode: res.statusCode,
             response: response
@@ -71,5 +94,6 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl) {
 }
 
 module.exports = {
-  verify
+  verify,
+  isValidChainId
 };

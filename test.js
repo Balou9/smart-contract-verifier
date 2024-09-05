@@ -1,6 +1,7 @@
 const test = require('tape');
-const { verify }= require('./index.js')
+const { verify, isValidChainId }= require('./index.js')
 const mpecdh_adress = "0x48Cc1a4e8994473C1f511A95c167698061Bad8Df"
+const mpecdh_metadata = require("./fixtures/metadata/MPECDHmetadata.json")
 
 test('test - Local smart contract verification', async function (t) {
     const mpecdh_url = "./fixtures/SafeMPECDH.sol"
@@ -44,19 +45,6 @@ test('test - Github source code smart contract verification - Gnosis', async fun
   t.end()
 })
 
-// test('test - Github source code smart contract verification - invalid chain id', async function (t) {
-//   const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
-//   // const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url)
-//   try {
-//     await verify('invalid-chain', mpecdh_adress, github_contract_url);
-//     t.fail('Expected error for invalid VRFR code');
-//   } catch (error) {
-//     t.ok(error.message); // More informative assertion
-//   }
-
-//   t.end();
-// })
-
 test('test - Ensures function throws appropriate error when given a non-solidity file', async function (t) {
     const non_solfile_url = "./fixtures/noop.txt"
     const expectedErrorMessage = `${non_solfile_url} is not a solidity file.`
@@ -70,6 +58,19 @@ test('test - Ensures function throws appropriate error when given a non-solidity
     }
     t.end()    
 })
+
+// test('test - Github source code smart contract verification - invalid chain id', async function (t) {
+//   const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
+//   // const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url)
+//   try {
+//     await verify('invalid-chain', mpecdh_adress, github_contract_url);
+//     t.fail('Expected error for invalid VRFR code');
+//   } catch (error) {
+//     t.ok(error.message); // More informative assertion
+//   }
+//   t.ok(isValidChainId("100"));
+//   t.end();
+// })
 
 // getSourcifyChainId
 // add error handling/tests if the given chainId is not supported for contract verification
