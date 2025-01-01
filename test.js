@@ -1,18 +1,20 @@
-const test = require('tape');
-const { verify, isValidChainId }= require('./index.js')
+import test from 'tape';
+import fs from 'fs';
+import { verify, isValidChainId } from './index.js';
 const mpecdh_adress = "0x48Cc1a4e8994473C1f511A95c167698061Bad8Df"
-const mpecdh_metadata = require("./fixtures/metadata/MPECDHmetadata.json")
+const mpecdh_metadata_content = fs.readFile("./fixtures/metadata/MPECDHmetadata.json")
+const mpecdh_metadata_json = JSON.parse(mpecdh_metadata_content);
 
 test('test - Local smart contract verification', async function (t) {
     const mpecdh_url = "./fixtures/SafeMPECDH.sol"
 
     try {
-      const vrfr_payload = await verify("11155111", mpecdh_adress, mpecdh_url)
+      const vrfr_payload = await verify("1", mpecdh_adress, mpecdh_url, mpecdh_metadata_json)
       console.log(vrfr_payload)
       t.ok(vrfr_payload, "is truthy")
       t.equal(vrfr_payload.statusCode, 200, "response status code equals 200")
     } catch (error) {
-      t.fails()
+      t.fail(error)
     }
 
     t.end()
@@ -20,7 +22,7 @@ test('test - Local smart contract verification', async function (t) {
 
 test('test - Github source code smart contract verification - Ethereum Testnet Sepolia', async function (t) {
     const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
-    const vrfr_payload = await verify("11155111", mpecdh_adress, github_contract_url)
+    const vrfr_payload = await verify("11155111", mpecdh_adress, github_contract_url, mpecdh_metadata_json)
     console.log(vrfr_payload)
     t.ok(vrfr_payload, "is thruthy")
     t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
@@ -29,7 +31,7 @@ test('test - Github source code smart contract verification - Ethereum Testnet S
 
 test('test - Github source code smart contract verification - Ethereum Mainnet', async function (t) {
   const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
-  const vrfr_payload = await verify("1", mpecdh_adress, github_contract_url)
+  const vrfr_payload = await verify("1", mpecdh_adress, github_contract_url, mpecdh_metadata_json)
   console.log(vrfr_payload)
   t.ok(vrfr_payload, "is thruthy")
   t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
@@ -38,7 +40,7 @@ test('test - Github source code smart contract verification - Ethereum Mainnet',
 
 test('test - Github source code smart contract verification - Gnosis', async function (t) {
   const github_contract_url = "https://raw.githubusercontent.com/Balou9/smart-contract-verifier/main/SafeMPECDH.sol"
-  const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url)
+  const vrfr_payload = await verify("100", mpecdh_adress, github_contract_url, mpecdh_metadata_json)
   console.log(vrfr_payload)
   t.ok(vrfr_payload, "is thruthy")
   t.equals(vrfr_payload.statusCode, 200, "response status code equals 200")
@@ -50,7 +52,7 @@ test('test - Ensures function throws appropriate error when given a non-solidity
     const expectedErrorMessage = `${non_solfile_url} is not a solidity file.`
   
     try {
-      await verify("11155111", mpecdh_adress, non_solfile_url)
+      await verify("11155111", mpecdh_adress, non_solfile_url, mpecdh_metadata_json)
       t.fail("expected an error to be thrown")
     } catch (error) {
       t.ok(error instanceof Error, "error is thrown")

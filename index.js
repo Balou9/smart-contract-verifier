@@ -51,7 +51,7 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl, contractM
   });
   
   const options = {
-      hostname: 'staging.sourcify.dev',
+      hostname: 'staging.sourcify.dev/server',
       path: '/verify',
       method: 'POST',
       headers: {
