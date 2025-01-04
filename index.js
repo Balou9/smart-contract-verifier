@@ -1,8 +1,8 @@
-const https = require('https');
-const fs = require('fs').promises;
-const path = require('path');
+import https from 'https';
+import fs from 'fs/promises'; 
+import { basename } from 'path'; 
 
-function isValidChainId (chainId) {
+export function isValidChainId (chainId) {
   const url = 'https://sourcify.dev/server/chains';
 
   https.get(url, (res) => {
@@ -24,7 +24,7 @@ function isValidChainId (chainId) {
   });
 }
 
-async function verify(chainId, contractAddress, contractSourceCodeUrl, contractMetadata) {
+export async function verify(chainId, contractAddress, contractSourceCodeUrl, contractMetadata) {
 
   // if contractMetadata is not json dann
 
@@ -39,7 +39,7 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl, contractM
     var sourceCode = await fs.readFile(contractSourceCodeUrl, 'utf8');
   }
 
-  const solFileName = path.basename(contractSourceCodeUrl)
+  const solFileName = basename(contractSourceCodeUrl)
 
   const data = JSON.stringify({
       address: contractAddress,
@@ -92,8 +92,3 @@ async function verify(chainId, contractAddress, contractSourceCodeUrl, contractM
   req.end();
   });
 }
-
-module.exports = {
-  verify,
-  isValidChainId
-};
